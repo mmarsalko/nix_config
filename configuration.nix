@@ -93,6 +93,8 @@ in
   services.xserver.displayManager.defaultSession = "plasmawayland";
 
   # Laptop power management
+  # It's claimed that ppd works better on AMD laptops, but my system has much better battery life
+  # using tlp. Swap these if you experiencce otherwise.
   services.power-profiles-daemon.enable = false;
   services.tlp.enable = true;
   powerManagement.enable = true;  # Enables hibernate?
