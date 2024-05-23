@@ -105,6 +105,9 @@ in
     xkbVariant = "";
   };
 
+  # Enable trim for SSDs
+  services.fstrim.enable = lib.mkDefault true;
+
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
@@ -154,6 +157,7 @@ in
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    framework-tool
     vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     gparted
