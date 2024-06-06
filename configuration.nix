@@ -3,20 +3,6 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, lib, ... }:
-let
-    nix-software-center = import (pkgs.fetchFromGitHub {
-      owner = "snowfallorg";
-      repo = "nix-software-center";
-      rev = "0.1.2";
-      sha256 = "xiqF1mP8wFubdsAQ1BmfjzCgOD3YZf7EGWl9i69FTls=";
-    }) {};
-
-#     old = import (fetchTarball {
-#       url = "https://github.com/NixOS/nixpkgs/archive/1a817360a574b00d818fc096bce4b6c5c52ba718.tar.gz";
-#       }) {};
-#     vagrant-old = old.vagrant;
-in
-
 
 let
   discover-wrapped = pkgs.symlinkJoin
@@ -42,18 +28,15 @@ in
       ./network-mounts.nix
       # Enable hibernation
       ./suspend-then-hibernate.nix
-      ##sudo nix-channel --add https://nixos.org/channels/nixos-unstable nixos-unstable
       ## Add unstable modules:
       <nixos-unstable/nixos/modules/services/networking/tailscale.nix>
       <nixos-hardware/framework/16-inch/7040-amd>
-#       <nixos-unstable/nixos/modules/services/desktop-managers/plasma6.nix>
-#       <nixos-unstable/nixos/modules/programs/chromium.nix>
 
     ];
 
-  nix.extraOptions = ''
-    experimental-features = nix-command flakes
-  '';
+#   nix.extraOptions = ''
+#     experimental-features = nix-command flakes
+#   '';
 
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
@@ -61,16 +44,11 @@ in
   boot.kernelPackages = pkgs.linuxPackages_6_9;
 
   networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
 
   # Might resolve DNS issues on resume from suspend?
   networking.useNetworkd = true;
   systemd.network.enable = true;
   systemd.network.wait-online.enable = false;
-
-  environment.variables = {
-    VAGRANT_DEFAULT_PROVIDER = "libvirt";
-  };
 
   # Enable bluetooth
   hardware.bluetooth.enable = true; # enables support for Bluetooth
@@ -83,10 +61,6 @@ in
   systemd.services.systemd-logind.environment = {
     SYSTEMD_BYPASS_HIBERNATION_MEMORY_CHECK = "1";
   };
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
 
   # platform and cpu options
@@ -119,7 +93,6 @@ in
 
   # Enable the KDE Plasma Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
-#   services.xserver.desktopManager.plasma5.enable = true;
   services.desktopManager.plasma6.enable = true;
 
   # Enable wayland
@@ -139,12 +112,6 @@ in
     xkbVariant = "";
   };
 
-  # Enable trim for SSDs
-  services.fstrim.enable = lib.mkDefault true;
-
-  # Enable CUPS to print documents.
-  services.printing.enable = true;
-
   # Enable sound with pipewire.
   sound.enable = false;
   hardware.pulseaudio.enable = false;
@@ -156,24 +123,18 @@ in
     pulse.enable = true;
   };
 
-  # Enable fingerprint reader support
-  services.fprintd.enable = true;
-
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.matt = {
     isNormalUser = true;
     description = "matt-lappy";
-    extraGroups = [ "networkmanager" "wheel" "qemu-libvirtd" "libvirtd" ];
+    extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       kate
       fish
       htop
       ktailctl  # Tailscale GUI
-#       unstable.ktailctl
-#       vagrant-2.2.19
       libsForQt5.kcalc
       git
-#       vagrant-old
       # Fixes the cursors
       (pkgs.runCommandLocal "breeze-cursors-fix" {} ''
         dir=$out/share/icons
@@ -194,14 +155,11 @@ in
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     framework-tool
-    vim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    vim
     wget
     gparted
     usbutils # lsusb, etc
-    nix-software-center
-    pkgs.fprintd # Enables fingerprint reader
     discover-wrapped # Discover store (flatpak)
-#     docker-compose
 
     # Vscode is a bit involved in order to get extensions working
     (vscode-with-extensions.override {
@@ -221,13 +179,7 @@ in
   })
   ];
 
-  # Default plasma config comes with some stuff. Don't want these.
-  environment.plasma5.excludePackages = with pkgs.libsForQt5; [
-    plasma-browser-integration
-  ];
-
-
-  # Install mullvad & tailscale
+  # Install mullvad
   services.mullvad-vpn.enable = true;
   services.mullvad-vpn.package = pkgs.mullvad-vpn;
   networking.nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
@@ -239,50 +191,15 @@ in
     dnsovertls = "true";
   };
 
+
+  # List services that you want to enable:
+  services.flatpak.enable = true;
+  services.printing.enable = true;
+  services.fprintd.enable = true;  # Fingerprint reader
+  services.fstrim.enable = lib.mkDefault true;  # SSD Trim
   services.tailscale.enable = true;
   services.tailscale.useRoutingFeatures = "client";
   services.tailscale.package = unstable.tailscale;
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-  services.flatpak.enable = true;
-#   services.touchegg.enable = true; # multi-touch gestures
-
-  # Docker
-#   virtualisation.docker.enable = true;
-#   virtualisation.docker.storageDriver = "btrfs";
-  # In case I need to store docker data outside of root
-#   virtualisation.docker.daemon.settings = {
-#     data-root = "/some-place/to-store-the-docker-data";
-#   };
-
-  # kvm for nixos dev:
-  virtualisation.libvirtd.enable = true;
-  boot.kernelModules = [ "kvm-amd" ];
-
-  services.nfs.server.enable = true;
-    # Add firewall exception for VirtualBox provider
-  networking.firewall.extraCommands = ''
-    ip46tables -I INPUT 1 -i vboxnet+ -p tcp -m tcp --dport 2049 -j ACCEPT
-  '';
-
-  # Add firewall exception for libvirt provider when using NFSv4
-  networking.firewall.interfaces."virbr1" = {
-    allowedTCPPorts = [ 2049 ];
-    allowedUDPPorts = [ 2049 ];
-  };
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Follows an upgrade channel to get command hints.
-  # I don't THINK this will actually auto-upgrade. I need to add more to the config for that.
-  #   system.autoUpgrade.channel = "https://channels.nixos.org/nixos-23.11/";
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
