@@ -27,7 +27,7 @@ in
       ./hardware-configuration.nix
       ./network-mounts.nix
       # Enable hibernation
-      ./suspend-then-hibernate.nix
+#       ./suspend-then-hibernate.nix
       ## Add unstable modules:
       <nixos-unstable/nixos/modules/services/networking/tailscale.nix>
       <nixos-hardware/framework/16-inch/7040-amd>
@@ -42,7 +42,6 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_6_9;
-
   networking.hostName = "nixos"; # Define your hostname.
 
   # Might resolve DNS issues on resume from suspend?
@@ -62,6 +61,12 @@ in
     SYSTEMD_BYPASS_HIBERNATION_MEMORY_CHECK = "1";
   };
 
+  # For some reason, suspend-then-hibernate doesn't work without
+  # Explicitly setting HibernateDelaySec myself.
+  systemd.sleep.extraConfig = ''
+    HibernateDelaySec=15m
+    SuspendState=mem
+  '';
 
   # platform and cpu options
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
@@ -128,13 +133,15 @@ in
     isNormalUser = true;
     description = "matt-lappy";
     extraGroups = [ "networkmanager" "wheel" ];
+    shell = pkgs.bash;
     packages = with pkgs; [
       kate
-      fish
-      htop
       ktailctl  # Tailscale GUI
       libsForQt5.kcalc
       git
+      anydesk
+      nil  # for nix code completion
+      nodePackages.vscode-json-languageserver # for nix code completion
       # Fixes the cursors
       (pkgs.runCommandLocal "breeze-cursors-fix" {} ''
         dir=$out/share/icons
@@ -147,6 +154,8 @@ in
   # Install firefox.
   programs.firefox.enable = true;
   programs.kdeconnect.enable = true;
+  programs.fish.enable = true;
+  programs.htop.enable = true;
 
   # Allow unfree packages
   nixpkgs.config.allowUnfree = true;
