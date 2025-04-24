@@ -5,17 +5,18 @@
 { config, pkgs, lib, ... }:
 
 let
-  discover-wrapped = pkgs.symlinkJoin
-    {
-      name = "discover-flatpak-backend";
-      paths = [ pkgs.libsForQt5.discover ];
-      buildInputs = [ pkgs.makeWrapper ];
-      postBuild = ''
-        wrapProgram $out/bin/plasma-discover --add-flags "--backends flatpak"
-      '';
-    };
+#   discover-wrapped = pkgs.symlinkJoin
+#     {
+#       name = "discover-flatpak-backend";
+#       paths = [ pkgs.libsForQt5.discover ];
+#       buildInputs = [ pkgs.makeWrapper ];
+#       postBuild = ''
+#         wrapProgram $out/bin/plasma-discover --add-flags "--backends flatpak"
+#       '';
+#     };
       unstable = import <nixos-unstable> {};
 
+  staticSDL2 = pkgs.SDL2.overrideAttrs (old: { dontDisableStatic = true; });
 in
 
 {
@@ -28,6 +29,7 @@ in
       ./network-mounts.nix
       # Enable hibernation
 #       ./suspend-then-hibernate.nix
+      ./kill-bluetooth-on-sleep.nix
       ## Add unstable modules:
       <nixos-unstable/nixos/modules/services/networking/tailscale.nix>
       <nixos-hardware/framework/16-inch/7040-amd>
@@ -41,7 +43,8 @@ in
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_6_9;
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+#   boot.kernelParams = [ "mem_sleep_default=deep" ];
   networking.hostName = "nixos"; # Define your hostname.
 
   # Might resolve DNS issues on resume from suspend?
@@ -64,7 +67,7 @@ in
   # For some reason, suspend-then-hibernate doesn't work without
   # Explicitly setting HibernateDelaySec myself.
   systemd.sleep.extraConfig = ''
-    HibernateDelaySec=15m
+    HibernateDelaySec=120m
     SuspendState=mem
   '';
 
@@ -111,6 +114,15 @@ in
   powerManagement.enable = true;  # Enables hibernate?
   powerManagement.cpuFreqGovernor = "powersave";
 
+  # Virtualbox
+#   virtualisation.virtualbox.host.enable = true;
+#   users.extraGroups.vboxusers.members = [ "matt" ];
+#   virtualisation.virtualbox.guest.enable = true;
+#   virtualisation.virtualbox.guest.draganddrop = true;
+  virtualisation.libvirtd.enable = true;
+  programs.virt-manager.enable = true;
+
+  #aces: rangers2022
   # Configure keymap in X11
   services.xserver = {
     layout = "us";
@@ -118,7 +130,7 @@ in
   };
 
   # Enable sound with pipewire.
-  sound.enable = false;
+#   sound.enable = false;
   hardware.pulseaudio.enable = false;
   security.rtkit.enable = true;
   services.pipewire = {
@@ -135,24 +147,55 @@ in
     extraGroups = [ "networkmanager" "wheel" ];
     shell = pkgs.bash;
     packages = with pkgs; [
-      kate
+      kdePackages.kate
       ktailctl  # Tailscale GUI
       libsForQt5.kcalc
       git
       anydesk
       nil  # for nix code completion
       nodePackages.vscode-json-languageserver # for nix code completion
+      #zoom-us
+      chromium
+      acpica-tools
+      unzip
+      baobab
+      popsicle # etcher alternative
+      # c build tools
+      gnumake
+      cmake
+      clang-tools
+      vcpkg
+      vcpkg-tool
+      gdb
+      gcc
+      zlib.dev
+      staticSDL2
+      SDL2.dev
+      SDL2_mixer_2_0.dev
+      curl.dev
+      libopenmpt.dev
+      libpng.dev
+      game-music-emu
+      neofetch
+      appimage-run # Run appimages through appimage-run
+      (python312Full.withPackages (python-pkgs: [
+        python-pkgs.distro
+        python-pkgs.pyudev
+        python-pkgs.systemd
+        python-pkgs.packaging
+        ]))
       # Fixes the cursors
       (pkgs.runCommandLocal "breeze-cursors-fix" {} ''
         dir=$out/share/icons
         mkdir -p $dir
-        ln -s ${breeze-qt5}/share/icons/breeze_cursors $dir/default
+        ln -s ${libsForQt5.breeze-qt5}/share/icons/breeze_cursors $dir/default
       '')
     ];
+
   };
 
   # Install firefox.
-  programs.firefox.enable = true;
+  #programs.firefox.enable = true;
   programs.kdeconnect.enable = true;
   programs.fish.enable = true;
   programs.htop.enable = true;
@@ -168,24 +211,29 @@ in
     wget
     gparted
     usbutils # lsusb, etc
-    discover-wrapped # Discover store (flatpak)
+#     discover-wrapped # Discover store (flatpak)
+    kdePackages.discover
+    pkgs.godot_4
+    vscode-fhs # Special version of vscode that can install extensions normally
 
-    # Vscode is a bit involved in order to get extensions working
-    (vscode-with-extensions.override {
-    vscodeExtensions = with vscode-extensions; [
-      bbenoist.nix
-      ms-python.python
-      ms-azuretools.vscode-docker
-      ms-vscode-remote.remote-ssh
-    ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
-      {
-        name = "remote-ssh-edit";
-        publisher = "ms-vscode-remote";
-        version = "0.47.2";
-        sha256 = "1hp6gjh4xp2m1xlm1jsdzxw9d8frkiidhph6nvl24d0h8z34w49g";
-      }
-    ];
-  })
+#     # Vscode is a bit involved in order to get extensions working
+#     (vscode-with-extensions.override {
+#     vscodeExtensions = with vscode-extensions; [
+#       bbenoist.nix
+#       ms-python.python
+#       ms-azuretools.vscode-docker
+#       ms-vscode-remote.remote-ssh
+#       geequlim.godot-tools
+#       alfish.godot-files
+#     ] ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+#       {
+#         name = "remote-ssh-edit";
+#         publisher = "ms-vscode-remote";
+#         version = "0.47.2";
+#         sha256 = "1hp6gjh4xp2m1xlm1jsdzxw9d8frkiidhph6nvl24d0h8z34w49g";
+#       }
+#     ];
+#     })
   ];
 
   # Install mullvad
@@ -204,7 +252,8 @@ in
   # List services that you want to enable:
   services.flatpak.enable = true;
   services.printing.enable = true;
-  services.fprintd.enable = true;  # Fingerprint reader
+  # Disable fingerprint reader until KDE support is better.
+#   services.fprintd.enable = true;  # Fingerprint reader
   services.fstrim.enable = lib.mkDefault true;  # SSD Trim
   services.tailscale.enable = true;
   services.tailscale.useRoutingFeatures = "client";
