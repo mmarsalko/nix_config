@@ -1,6 +1,6 @@
 { config, lib, pkgs, modulesPath, ... }:
 
-
+# Only for use with tailscale
 {
   networking.hosts = { "fd7a:115c:a1e0::3501:c33e" = [ "synology" ]; };
 
