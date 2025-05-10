@@ -17,7 +17,7 @@
     git
     appimage-run
     libsForQt5.kcalc
-    guake
+    kdePackages.yakuake
     dconf-editor
     nixd  # server for nix code completion.
     nix-index # allows nme to find who supplies an so file using eg: 'nix-locate --top-level libz.so.1'

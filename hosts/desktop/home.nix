@@ -109,18 +109,4 @@
     enableFishIntegration = true;
   };
 
-  # Guake settings
-  dconf = {
-    enable = true;
-    settings = {
-      "org/guake/general".quick-open-command-line = "/run/current-system/sw/bin/kate %(file_path)s";
-      "org/guake/general".default-shell = "/run/current-system/sw/bin/fish";
-      "org/guake/general".window-width = 50;
-      "org/guake/general".start-at-login = true;
-      "org/guake/general".use-default-font = false;
-      "org/guake/style/font".style = "Monospace 10";
-      "org/guake/style/background".transparency = 80;
-    };
-  };
-
 }

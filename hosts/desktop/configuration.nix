@@ -27,9 +27,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
 
-  # Turn off ftdi to prevent fighting with the Everdrive
-#   boot.blacklistedKernelModules = [ "ftdi_sio" ];
-
   networking.hostName = "nixos_desktop"; # Define your hostname.
 
   nix.settings = {
@@ -63,7 +60,6 @@
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
 
-    #  thunderbird
     ];
   };
 

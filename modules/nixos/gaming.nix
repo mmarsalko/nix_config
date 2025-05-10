@@ -11,6 +11,10 @@
     services.xserver.enable = true;
     services.xserver.videoDrivers = ["amdgpu"];
 
+    # Allows LACT to overclock the GPU
+    boot.kernelParams = [
+        "amdgpu.ppfeaturemask=0xffffffff"
+    ];
     programs = {
         steam = {
             enable = true;
