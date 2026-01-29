@@ -21,11 +21,25 @@
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.supportedFilesystems = [ "ntfs" ];
 
+  # Bootloader (grub). This is the default when running in a VM..
+  # boot.loader.grub.enable = true;
+  # boot.loader.grub.device = "/dev/sda";
+  # boot.loader.grub.useOSProber = true;
+
   networking.hostName = "matt-htpc"; # Define your hostname.
+  networking.networkmanager.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  main-user.enable = true;
-  main-user.userName = "matt-htpc";
+#   main-user.enable = true;
+#   main-user.userName = "matt-htpc";
+  users.users.matt-htpc = {
+    isNormalUser = true;
+    description = "matt-htpc";
+    extraGroups = [ "networkmanager" "wheel" ];
+    packages = with pkgs; [];
+  };
+
+  nixpkgs.config.allowUnfree = true;
 
   # Pulled from Nixos fish wiki. Launches fish from bash when in an interactive terminal
   # Recommended because fish being used as login shell is bad for POSIX reasons
@@ -86,6 +100,6 @@
   # this value at the release version of the first install of this system.
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
-  system.stateVersion = "24.11"; # Did you read the comment?
+  system.stateVersion = "25.11"; # Did you read the comment?
 
 }
