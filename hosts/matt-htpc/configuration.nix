@@ -15,15 +15,15 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Bootloader.
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.supportedFilesystems = [ "ntfs" ];
+#   boot.loader.systemd-boot.enable = true;
+#   boot.loader.efi.canTouchEfiVariables = true;
+#   boot.kernelPackages = pkgs.linuxPackages_latest;
+#   boot.supportedFilesystems = [ "ntfs" ];
 
   # Bootloader (grub). This is the default when running in a VM..
-  # boot.loader.grub.enable = true;
-  # boot.loader.grub.device = "/dev/sda";
-  # boot.loader.grub.useOSProber = true;
+  boot.loader.grub.enable = true;
+  boot.loader.grub.device = "/dev/sda";
+  boot.loader.grub.useOSProber = true;
 
   networking.hostName = "matt-htpc"; # Define your hostname.
   networking.networkmanager.enable = true;
