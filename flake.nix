@@ -34,6 +34,12 @@
           inputs.home-manager.nixosModules.default
         ];
       };*/
+      nixos_matt-htpc = nixpkgs.lib.nixosSystem {
+        specialArgs = {inherit inputs;};
+        modules = [
+          ./hosts/matt-htpc/configuration.nix
+        ];
+      };
     };
   };
 }
