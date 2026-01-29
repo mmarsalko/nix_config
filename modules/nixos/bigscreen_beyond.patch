@@ -238,7 +238,7 @@ index 2c36f3d00ca2..322059dca3ae 100644
  
 +	edid_caps->dsc_fixed_bits_per_pixel_x16 = connector->display_info.dp_dsc_bpp;
 +
- 	apply_edid_quirks(edid_buf, edid_caps);
+ 	apply_edid_quirks(dev, edid_buf, edid_caps);
  
  	sad_count = drm_edid_to_sad((struct edid *) edid->raw_edid, &sads);
 

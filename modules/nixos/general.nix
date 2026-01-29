@@ -16,7 +16,7 @@
     kdePackages.kate
     git
     appimage-run
-    libsForQt5.kcalc
+    kdePackages.kcalc
     kdePackages.yakuake
     dconf-editor
     nixd  # server for nix code completion.
@@ -24,13 +24,32 @@
     fd
     fishPlugins.fzf-fish
     fzf
-    (python312Full.withPackages (python-pkgs: [
+    yt-dlp
+    ffmpeg
+    audacity
+    distrobox
+    distrobox-tui
+    podman
+#     winboat
+    (python312.withPackages (python-pkgs: [
         python-pkgs.distro
         python-pkgs.pyudev
         python-pkgs.systemd
         python-pkgs.packaging
     ]))
   ];
+
+  # Printing support
+  services.printing.enable = true;
+    services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    openFirewall = true;
+  };
+
+  # This enables AppImage support.
+  programs.appimage.enable = true;
+  programs.appimage.binfmt = true;
 
   # Set your time zone.
   time.timeZone = "America/Los_Angeles";

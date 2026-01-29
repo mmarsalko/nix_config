@@ -1,13 +1,4 @@
-{
-  lib,
-  stdenv,
-  fetchFromGitHub,
-  ncurses,
-  libftdi1,
-  libusb1,
-  pkg-config,
-  nix-update-script,
-}:
+{ lib,  stdenv,  fetchFromGitHub,  ncurses,  libftdi1,  libusb1,  pkg-config,  nix-update-script }:
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "unfloader";

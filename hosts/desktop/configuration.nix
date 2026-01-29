@@ -16,7 +16,6 @@
       ../../modules/nixos/wayland.nix
       ../../modules/nixos/gamedev.nix
       ../../modules/nixos/vr.nix
-
     ];
 
   # Flakeys
@@ -26,7 +25,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-
+  boot.supportedFilesystems = [ "ntfs" ];
+  
   networking.hostName = "nixos_desktop"; # Define your hostname.
 
   nix.settings = {
@@ -47,6 +47,10 @@
     pulse.enable = true;
   };
 
+  # QMK Keyboard shit
+  hardware.keyboard.qmk.enable = true;
+  services.udev.packages = with pkgs; [ via ];
+
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
@@ -54,12 +58,19 @@
 #   main-user.enable = true;
 #   main-user.userName = "matt";
 
+  # Virtualbox
+  virtualisation.virtualbox.host.enable = true;
+  users.extraGroups.vboxusers.members = [ "matt" ];
+  nixpkgs.config.allowUnfree = true;
+  virtualisation.virtualbox.host.enableExtensionPack = true;
+
   users.users.matt = {
     isNormalUser = true;
     description = "matt";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-
+      ntfs3g
+      via
     ];
   };
 
@@ -100,6 +111,7 @@
     shellAliases= {
       cat = "bat --paging=never";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos/#nixos_desktop";
+      upgrade = "sudo nixos-rebuild switch --upgrade --flake ~/nixos/#nixos_desktop";
     };
   };
   programs.starship.presets = "gruvbox-rainbow";

@@ -10,8 +10,10 @@
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "usbhid" "usb_storage" "uas" "sd_mod" "sr_mod" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-amd" ];
+  # enable kvm support, but don't load right away, or virtualbox doesn't work.
+  boot.kernelModules = [ "kvm-amd" "kvm.enable_virt_at_load=0" ];
   boot.extraModulePackages = [ ];
+  boot.supportedFilesystems = [ "ntfs" ];
 
   fileSystems."/" =
     { device = "/dev/disk/by-uuid/564170e3-921d-46da-91c3-7287272ffc91";
@@ -34,6 +36,12 @@
   fileSystems."/run/media/matt/71cbd99d-c718-4101-9063-8a9a6bfb8c10" =
   {  device = "/dev/disk/by-uuid/71cbd99d-c718-4101-9063-8a9a6bfb8c10";
      fsType = "ext4";
+  };
+
+  # BIG HDD
+  fileSystems."/run/media/matt/BIGHDD" =
+  {  device = "/dev/disk/by-uuid/84DE70A1DE708CE4";
+     fsType = "ntfs";
   };
   swapDevices = [ ];
 

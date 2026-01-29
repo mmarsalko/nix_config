@@ -21,6 +21,9 @@
     environment.systemPackages = with pkgs; [
         opencomposite
         wlx-overlay-s
+        # these are needed by wlx-overlay-s when a controller is on.. for some reason
+        kdePackages.kdialog
+        zenity
     ];
 
     boot.kernelPatches = [{

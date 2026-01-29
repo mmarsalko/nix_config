@@ -26,7 +26,7 @@
         pkgs.godot_4_3
         pkgs.blender
         pkgs.code-cursor # ai IDE
-        pkgs.toybox
+        pkgs.busybox
     ];
 
     # Needed for spacemouse in blender
