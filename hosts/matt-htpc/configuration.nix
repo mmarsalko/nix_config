@@ -49,7 +49,6 @@
   programs.starship = {
     enable = true;
     enableInteractive = true;
-    enableFishIntegration = true;
   };
   programs.bash = {
   interactiveShellInit = ''
