@@ -35,7 +35,11 @@
     isNormalUser = true;
     description = "matt-htpc";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = with pkgs; [];
+    packages = with pkgs; [
+      bat
+      powerline-fonts
+      fira-code-nerdfont
+    ];
   };
 
   nixpkgs.config.allowUnfree = true;
@@ -67,8 +71,8 @@
     '';
     shellAliases= {
       cat = "bat --paging=never";
-      rebuild = "sudo nixos-rebuild switch --flake ~/nixos/#nixos_desktop";
-      upgrade = "sudo nixos-rebuild switch --upgrade --flake ~/nixos/#nixos_desktop";
+      rebuild = "sudo nixos-rebuild switch --flake ~/nixos/#nixos_matt-htpc";
+      upgrade = "sudo nixos-rebuild switch --upgrade --flake ~/nixos/#nixos_matt-htpc";
     };
   };
   programs.starship.presets = "gruvbox-rainbow";
