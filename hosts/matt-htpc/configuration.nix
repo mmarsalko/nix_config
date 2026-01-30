@@ -38,6 +38,7 @@
     packages = with pkgs; [
       bat
       powerline-fonts
+      starship
       fira-code-nerdfont
     ];
   };
@@ -45,9 +46,7 @@
   nixpkgs.config.allowUnfree = true;
 
   # Pulled from Nixos fish wiki. Launches fish from bash when in an interactive terminal
-  # Recommended because fish being used as login shell is bad for POSIX reasons
-  programs.starship.enable = true;
-  programs.bash = {
+  # Recommended because fish being used as login shell is bad for POSIX reasons  programs.bash = {
   interactiveShellInit = ''
     if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
     then
