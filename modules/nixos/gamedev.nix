@@ -27,6 +27,7 @@
         pkgs.blender
         pkgs.code-cursor # ai IDE
         pkgs.busybox
+        pkgs.nixd  # server for nix code completion.
     ];
 
     # Needed for spacemouse in blender
