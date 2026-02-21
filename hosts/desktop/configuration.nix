@@ -120,8 +120,20 @@
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    kdePackages.kio-extras
   ];
 
+  # Mount matt-htpc home dir for easy editing.
+  fileSystems."/mnt/matt-htpc" = {
+  device = "matt-htpc@192.168.1.13:/home/matt-htpc/";
+  fsType = "sshfs";
+  options = [
+    "nodev"
+    "noatime"
+    "allow_other"
+    "IdentityFile=/home/matt/.ssh/id_rsa"
+  ];
+};
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
