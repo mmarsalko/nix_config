@@ -18,12 +18,6 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.supportedFilesystems = [ "ntfs" ];
-
-  # Bootloader (grub). This is the default when running in a VM..
-#   boot.loader.grub.enable = true;
-#   boot.loader.grub.device = "/dev/sda";
-#   boot.loader.grub.useOSProber = true;
 
   networking.hostName = "matt-htpc"; # Define your hostname.
   networking.networkmanager.enable = true;
@@ -32,8 +26,6 @@
   };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-#   main-user.enable = true;
-#   main-user.userName = "matt-htpc";
   users.users.matt-htpc = {
     isNormalUser = true;
     description = "matt-htpc";
@@ -83,6 +75,7 @@
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     pkgs.cifs-utils # for cifs mounts
+    restic # for backups
   ];
 
   environment.variables = {
@@ -90,8 +83,8 @@
     PLEX_TV_SERIES = "/media/nas/plex/tvseries";
     PLEX_MOVIES = "/media/nas/plex/movies";
     PLEX_UNSHARED = "/media/nas/plex/unshared";
-    STARR_DOWNLOADS = "/run/media/matt-htpc/starr_downloads/downloads";
-    STARR_INCOMPLETE = "/run/media/matt-htpc/starr_downloads/incomplete";
+    STARR_DOWNLOADS = "/media/matt-htpc/starr_downloads/downloads";
+    STARR_INCOMPLETE = "/media/matt-htpc/starr_downloads/incomplete";
     WORKSPACE = "/home/matt-htpc/workspace";
   };
 
@@ -101,12 +94,6 @@
       log-driver = "journald";
       storage-driver = "btrfs";
     };
-    # NOTE: Can't access services on the network with rootless.
-    # Just add matt-htpc to docker group instead (effectively root)
-#     rootless = {
-#       enable = true;
-#       setSocketVariable = true;
-#     };
   };
 
   # Create docker reverse proxy volume for containers to connect to.
@@ -173,6 +160,13 @@
     options = [ "defaults" ];
   };
 
+  # RESTIC BACKUP (btrfs snapshots) STORED AT /media/nas/htpc-backup/restic
+  fileSystems."/media/nas/htpc-backup" = {
+    device = "nasbox:/volume1/htpc-backup";
+    fsType = "nfs";
+    options = [ "defaults" ];
+  };
+
   fileSystems."/media/nas/share" = {
     device = "//nasbox/share";
     fsType = "cifs";
@@ -186,21 +180,30 @@
   };
 
   # Physical drive
-  # NOTE: Enable me on real hardware!
   fileSystems."/media/matt-htpc/starr_downloads" = {
     device = "/dev/disk/by-uuid/954f20cb-54c7-4955-ba67-ebb42cea2ed1";
     fsType = "auto";
     options = [ "nosuid" "nodev" "nofail" "x-gvfs-show" "rw" ];
   };
 
+  # Mount the old 512GB drive. Will probably use this for something in the future
+  fileSystems."/media/matt-htpc/ubuntu" = {
+    device = "/dev/disk/by-uuid/f5d25ed5-728a-414f-9382-4caab0727cf1";
+    fsType = "auto";
+    options = [ "nosuid" "nodev" "nofail" "x-gvfs-show" "rw" ];
+  };
 
+  # BACKUP LOGIC:
+  # Btrfs snapshot twice daily
+  # Replicate to NAS once daily /w restic
+  # NAS does cloud backup weekly
   services.cron = {
     enable = true;
     mailto = "cron@shaffle.me";
     systemCronJobs = [
-      "0 2 * * Tue root /opt/backup.sh"
-      "0 1 * * * root /opt/restart_transmission.sh"
-      "*/10 * * * * root /opt/dyndns.sh 2>&1 | logger -t matt_dyndns"
+      "0 6,18 * * * root /home/matt-htpc/nixos/hosts/matt-htpc/snapshot.sh"
+      "0 2 * * * root /home/matt-htpc/nixos/hosts/matt-htpc/backup.sh"
+      "*/10 * * * * root /home/matt-htpc/nixos/hosts/matt-htpc/dyndns.sh 2>&1 | logger -t matt_dyndns"
     ];
   };
 
