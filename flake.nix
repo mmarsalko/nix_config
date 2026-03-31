@@ -25,7 +25,7 @@
           inputs.home-manager.nixosModules.default
           lsfg-vk-flake.nixosModules.default
         ];
-      };/*
+      };
       nixos_laptop = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs;};
         modules = [
@@ -33,7 +33,7 @@
 
           inputs.home-manager.nixosModules.default
         ];
-      };*/
+      };
       nixos_matt-htpc = nixpkgs.lib.nixosSystem {
         specialArgs = {inherit inputs;};
         modules = [
