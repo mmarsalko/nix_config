@@ -79,6 +79,12 @@ in
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
     hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
 
+    # Shortcuts/Aliases
+    programs.fish.shellAliases= {
+      cat = "bat --paging=never";
+      rebuild = "sudo nixos-rebuild switch --impure --flake /etc/nixos/#nixos_laptop";
+      upgrade = "sudo nixos-rebuild switch --impure --upgrade --flake /etc/nixos/#nixos_laptop";
+    };
     # Set up tailscale (disable stable modules)
     disabledModules = [ "services/networking/tailscale.nix" ];
     services.tailscale.enable = true;

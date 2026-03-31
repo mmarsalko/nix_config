@@ -97,6 +97,30 @@
     dnsovertls = "true";
   };
 
+  # We like fish
+  # Pulled from Nixos fish wiki. Launches fish from bash when in an interactive terminal
+  # Recommended because fish being used as login shell is bad for POSIX reasons
+  programs.bash = {
+  interactiveShellInit = ''
+    if [[ $(${pkgs.procps}/bin/ps --no-header --pid=$PPID --format=comm) != "fish" && -z ''${BASH_EXECUTION_STRING} ]]
+    then
+      shopt -q login_shell && LOGIN_OPTION='--login' || LOGIN_OPTION=""
+      exec ${pkgs.fish}/bin/fish $LOGIN_OPTION
+    fi
+  '';
+  };
+  programs.fish = {
+    enable = true;
+
+    interactiveShellInit = ''
+      fastfetch
+      starship init fish | source
+      echo "Ctrl+Alt+S for git status"
+      echo "Ctrl+Alt+F for file search"
+    '';
+  };
+  programs.starship.presets = "gruvbox-rainbow";
+
   services.fstrim.enable = lib.mkDefault true;  # SSD Trim#
   programs.kdeconnect.enable = true;
 
