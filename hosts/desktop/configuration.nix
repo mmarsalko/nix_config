@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, inputs, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 {
   imports =
@@ -24,9 +24,24 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
+  # Manually define kernel so it doesn't upgrade on its own. (Often causes problems)
   boot.kernelPackages = pkgs.linuxPackages_latest;
+#   boot.kernelPackages = pkgs.linuxPackages_6_17;
   boot.supportedFilesystems = [ "ntfs" ];
   
+  # Enable kernel ntsync support (have not tried yet)
+  boot.kernelPatches = [    {
+      name = "enable-ntsync";
+      patch = null;
+      structuredExtraConfig = with lib.kernel; {
+        NTSYNC = module;  # Builds as loadable module (m=y equivalent)^5^^7^
+      };
+    }
+  ];
+  services.udev.extraRules = ''
+    KERNEL=="ntsync", MODE="0666"
+  '';
+
   networking.hostName = "nixos_desktop"; # Define your hostname.
 
   nix.settings = {
@@ -59,18 +74,19 @@
 #   main-user.userName = "matt";
 
   # Virtualbox
-  virtualisation.virtualbox.host.enable = true;
-  users.extraGroups.vboxusers.members = [ "matt" ];
-  nixpkgs.config.allowUnfree = true;
-  virtualisation.virtualbox.host.enableExtensionPack = true;
+#   virtualisation.virtualbox.host.enable = true;
+#   users.extraGroups.vboxusers.members = [ "matt" ];
+#   nixpkgs.config.allowUnfree = true;
+#   virtualisation.virtualbox.host.enableExtensionPack = true;
 
   users.users.matt = {
     isNormalUser = true;
     description = "matt";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "adbusers" "kvm" ];
     packages = with pkgs; [
       ntfs3g
       via
+      pkgs.android-tools
     ];
   };
 
@@ -110,8 +126,8 @@
     '';
     shellAliases= {
       cat = "bat --paging=never";
-      rebuild = "sudo nixos-rebuild switch --flake ~/nixos/#nixos_desktop";
-      upgrade = "sudo nixos-rebuild switch --upgrade --flake ~/nixos/#nixos_desktop";
+      rebuild = "sudo nixos-rebuild switch --impure --flake ~/nixos/#nixos_desktop";
+      upgrade = "sudo nixos-rebuild switch --impure --upgrade --flake ~/nixos/#nixos_desktop";
     };
   };
   programs.starship.presets = "gruvbox-rainbow";
@@ -119,8 +135,12 @@
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
+
   environment.systemPackages = with pkgs; [
     kdePackages.kio-extras
+    kdePackages.kwalletmanager
+    kdePackages.wallpaper-engine-plugin
+    eden
   ];
 
   # Mount matt-htpc home dir for easy editing.
