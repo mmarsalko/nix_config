@@ -16,6 +16,7 @@
       ../../modules/nixos/wayland.nix
       ../../modules/nixos/gamedev.nix
       ../../modules/nixos/vr.nix
+      ../../modules/nixos/airplay.nix
     ];
 
   # Flakeys
@@ -87,6 +88,7 @@
       ntfs3g
       via
       pkgs.android-tools
+      pkgs.bazaar
     ];
   };
 
