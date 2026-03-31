@@ -22,6 +22,9 @@ in
       <nixos-hardware/framework/16-inch/7040-amd>
     ];
 
+    # Flakeys
+    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
     users.users.matt = {
         isNormalUser = true;
         description = "matt-lappy";
