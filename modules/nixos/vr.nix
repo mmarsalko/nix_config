@@ -20,7 +20,7 @@
     # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc %command%
     environment.systemPackages = with pkgs; [
         opencomposite
-        wlx-overlay-s
+        wayvr
         # these are needed by wlx-overlay-s when a controller is on.. for some reason
         kdePackages.kdialog
         zenity

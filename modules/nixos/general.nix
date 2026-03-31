@@ -29,11 +29,12 @@
     distrobox
     distrobox-tui
     podman
+    htop
 #     winboat
-    (python312.withPackages (python-pkgs: [
+    (python313.withPackages (python-pkgs: [
         python-pkgs.distro
         python-pkgs.pyudev
-        python-pkgs.systemd
+        python-pkgs.systemd-python
         python-pkgs.packaging
     ]))
   ];
