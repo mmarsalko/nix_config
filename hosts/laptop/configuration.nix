@@ -73,10 +73,15 @@ in
 
     # For some reason, suspend-then-hibernate doesn't work without
     # Explicitly setting HibernateDelaySec myself.
-    systemd.sleep.extraConfig = ''
-        HibernateDelaySec=120m
-        SuspendState=mem
-    '';
+    # No longer needed/supported 3/30/26
+#     systemd.sleep.extraConfig = ''
+#         HibernateDelaySec=120m
+#         SuspendState=mem
+#     '';
+    systemd.sleep.settings.Sleep = {
+        HibernateDelaySec = "2h";
+        SuspendState="mem";
+    };
 
     # platform and cpu options
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
@@ -93,6 +98,9 @@ in
     services.tailscale.enable = true;
     services.tailscale.useRoutingFeatures = "client";
     services.tailscale.package = unstable.tailscale;
+
+    # Fingerprint sensor is too buggy in KDE. Remove it.
+    services.fprintd.enable = false;
 
     system.stateVersion = "23.11"; # Did you read the comment?
 }

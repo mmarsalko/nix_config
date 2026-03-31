@@ -103,10 +103,5 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   fonts.fontconfig.enable = true;
-  programs.starship = {
-    enable = true;
-    enableInteractive = true;
-    enableFishIntegration = true;
-  };
 
 }

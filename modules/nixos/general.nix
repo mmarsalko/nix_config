@@ -30,6 +30,7 @@
     distrobox-tui
     podman
     htop
+    starship
 #     winboat
     (python313.withPackages (python-pkgs: [
         python-pkgs.distro
@@ -119,7 +120,8 @@
       echo "Ctrl+Alt+F for file search"
     '';
   };
-  programs.starship.presets = "gruvbox-rainbow";
+  programs.starship.enable = true;
+  programs.starship.presets = [ "gruvbox-rainbow" ];
 
   services.fstrim.enable = lib.mkDefault true;  # SSD Trim#
   programs.kdeconnect.enable = true;
