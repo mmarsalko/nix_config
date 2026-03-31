@@ -57,8 +57,8 @@
     bat
 #     dejavu_fonts
     powerline-fonts
-#    nerdfonts.fira-code
-      fira-code-nerdfont
+    fira-code
+      #fira-code-nerdfont
 
 #     fontconfig
 #     busybox
