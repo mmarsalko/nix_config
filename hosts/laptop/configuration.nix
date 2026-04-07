@@ -45,6 +45,27 @@ in
     boot.loader.systemd-boot.enable = true;
     boot.loader.efi.canTouchEfiVariables = true;
     boot.kernelPackages = pkgs.linuxPackages_latest;
+    # 4/3/26 This disables PSR-SU (display power saving feature) to resolve artifacting issues
+    # Try turning it back on sometime later, maybe the issue eventually gets fixed.
+    boot.kernelParams = [
+      "amdgpu.dcdebugmask=0x410"
+      "quiet" "splash" "rd.systemd.show_status=false" "rd.udev.log_level=3"
+      "udev.log_level=3" "log_level=3" "udev.log_priority=3" "boot.shell_on_fail"  # Boot STFU params
+    ];
+
+    boot.plymouth = {
+      enable = true;
+      theme = "bgrt"; # UEFI's logo
+    };
+    services.displayManager.sddm.enable = true;
+
+    # Quieter boot
+    boot.initrd.verbose = false;
+    boot.consoleLogLevel = 0;
+
+    # Don't show generation select for too long
+    boot.loader.timeout = 1;
+
     boot.supportedFilesystems = [ "ntfs" ];
 
     # Laptop power management
