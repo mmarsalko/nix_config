@@ -33,7 +33,7 @@
     packages = with pkgs; [
       bat
       powerline-fonts
-      fira-code-nerdfont
+      fira-code
       docker-compose
       htop # move to general.nix later.
     ];
