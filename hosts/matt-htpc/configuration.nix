@@ -121,7 +121,7 @@
   boot.kernelParams = [ "i915.enable_guc=3" ];
 
   ####### Filesystem mounts #######
-  zramSwap.enable = true; # Download more RAM
+  #zramSwap.enable = true; # Download more RAM
   boot.supportedFilesystems = [ "nfs" "cifs"];
   services.rpcbind.enable = true; # required for NFS
 
