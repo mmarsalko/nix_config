@@ -120,6 +120,15 @@
   hardware.enableRedistributableFirmware = true;
   boot.kernelParams = [ "i915.enable_guc=3" ];
 
+  # Periodically check file consistency.
+  ## Review last check with `btrfs scrub status /`
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    fileSystems = [ "/" ];
+  };
+
+
   ####### Filesystem mounts #######
   zramSwap.enable = false; # Download more RAM
   boot.supportedFilesystems = [ "nfs" "cifs"];
@@ -168,6 +177,12 @@
     device = "/dev/disk/by-uuid/f5d25ed5-728a-414f-9382-4caab0727cf1";
     fsType = "auto";
     options = [ "nosuid" "nodev" "nofail" "x-gvfs-show" "rw" ];
+  };
+
+  # Enable de-duplication
+  fileSystems = {
+    "/".options = [ "compress=zstd" "noatime" ];
+    "/home".options = [ "compress=zstd" "noatime" ];
   };
 
   # BACKUP LOGIC:
