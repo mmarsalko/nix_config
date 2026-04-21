@@ -83,12 +83,13 @@
   users.users.matt = {
     isNormalUser = true;
     description = "matt";
-    extraGroups = [ "networkmanager" "wheel" "adbusers" "kvm" ];
+    extraGroups = [ "networkmanager" "wheel" "adbusers" "kvm" "gamemode" ];
     packages = with pkgs; [
       ntfs3g
       via
       pkgs.android-tools
       pkgs.bazaar
+      pkgs.winboat
     ];
   };
 
