@@ -90,6 +90,9 @@
       pkgs.android-tools
       pkgs.bazaar
       pkgs.winboat
+      pkgs.p7zip
+      pkgs.jq
+      pkgs.discord
     ];
   };
 
@@ -112,6 +115,7 @@
       cat = "bat --paging=never";
       rebuild = "sudo nixos-rebuild switch --impure --flake ~/nixos/#nixos_desktop";
       upgrade = "sudo nixos-rebuild switch --impure --upgrade --flake ~/nixos/#nixos_desktop";
+      "7zip" = "p7zip";
   };
 
   # List packages installed in system profile. To search, run:

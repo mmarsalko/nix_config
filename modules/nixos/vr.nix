@@ -16,8 +16,9 @@
     # Uncomment if it's stuttering
 #     systemd.user.services.monado.environment = {};
 
-    # Add this to the launch line in steamvr titles to use monado instead:
+    # ATTENTION: Add this to the launch line in steamvr titles to use monado instead:
     # PRESSURE_VESSEL_FILESYSTEMS_RW=$XDG_RUNTIME_DIR/monado_comp_ipc %command%
+    # You may also need to run systemctl --user start monado.service
     environment.systemPackages = with pkgs; [
         opencomposite
         wayvr
@@ -26,10 +27,15 @@
         zenity
     ];
 
-    boot.kernelPatches = [{
-        name = "beyondfix";
-        patch = ./bigscreen_beyond.patch;
-    }
+    boot.kernelPatches = [
+        {
+            name = "beyondfix";
+            patch = ./bigscreen_beyond.patch;
+        }
+        {
+            name = "beyondfix-dsc";
+            patch = ./bigscreen_beyond_dsc.patch;
+        }
     # {
     #     name = "amdgpu-ignore-ctx-privileges";
     #     patch = pkgs.fetchpatch {
@@ -39,6 +45,18 @@
     #     };
     # }
     ];
+
+    # Udev rules for bigscreen beyond
+    services.udev.extraRules = ''
+    # Bigscreen Beyond
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="35bd", ATTRS{idProduct}=="0101", MODE="0660", GROUP="wheel"
+    # Bigscreen Bigeye
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="35bd", ATTRS{idProduct}=="0202", MODE="0660", GROUP="wheel"
+    # Bigscreen Beyond Audio Strap
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="35bd", ATTRS{idProduct}=="0105", MODE="0660", GROUP="wheel"
+    # Bigscreen Beyond Firmware Mode?
+    KERNEL=="hidraw*", SUBSYSTEM=="hidraw", ATTRS{idVendor}=="35bd", ATTRS{idProduct}=="4004", MODE="0660", GROUP="wheel"
+    '';
 
     # OpenVR configuration for user matt
     home-manager.users.matt = { 
