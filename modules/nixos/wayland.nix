@@ -8,4 +8,9 @@
     # Enable the KDE Plasma Desktop Environment.
     services.displayManager.sddm.enable = true;
     services.desktopManager.plasma6.enable = true;
+
+    # This is where desktop-only apps should be added, to avoid bloat on headless servers.
+    environment.systemPackages = with pkgs; [
+        proton-pass
+    ];
 }
