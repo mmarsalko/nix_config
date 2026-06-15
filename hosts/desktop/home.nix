@@ -57,7 +57,8 @@
     bat
 #     dejavu_fonts
     powerline-fonts
-    fira-code
+    powerline-symbols
+    nerd-fonts.fira-mono
       #fira-code-nerdfont
 
 #     fontconfig
@@ -103,5 +104,8 @@
   # Let Home Manager install and manage itself.
   programs.home-manager.enable = true;
   fonts.fontconfig.enable = true;
+
+  # Change color scheme
+  programs.starship.presets = [ "pastel-powerline" ];
 
 }
