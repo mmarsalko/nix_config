@@ -16,7 +16,9 @@
       ../../modules/nixos/wayland.nix
       ../../modules/nixos/gamedev.nix
       ../../modules/nixos/vr.nix
-      ../../modules/nixos/airplay.nix
+#       ../../modules/nixos/airplay.nix
+      ../../modules/nixos/reboot_to_windows.nix
+      ../../modules/nixos/ai.nix
     ];
 
   # Flakeys
@@ -63,6 +65,11 @@
     pulse.enable = true;
   };
 
+  # Change permission of energy file so MangoHud knows CPU power usage.
+  systemd.tmpfiles.rules = [
+    "z /sys/class/powercap/intel-rapl:0/energy_uj 0444 root root - -"
+  ];
+
   # QMK Keyboard shit
   hardware.keyboard.qmk.enable = true;
   services.udev.packages = with pkgs; [ via ];
@@ -83,7 +90,7 @@
   users.users.matt = {
     isNormalUser = true;
     description = "matt";
-    extraGroups = [ "networkmanager" "wheel" "adbusers" "kvm" "gamemode" ];
+    extraGroups = [ "networkmanager" "wheel" "adbusers" "kvm" "gamemode" "uinput"];
     packages = with pkgs; [
       ntfs3g
       via
@@ -93,6 +100,8 @@
       pkgs.p7zip
       pkgs.jq
       pkgs.discord
+      pkgs.sparrow
+      inputs.linux-devmgmt.packages.x86_64-linux.default  # Windows-style Device Manager
     ];
   };
 
@@ -114,9 +123,14 @@
   programs.fish.shellAliases= {
       cat = "bat --paging=never";
       rebuild = "sudo nixos-rebuild switch --impure --flake ~/nixos/#nixos_desktop";
-      upgrade = "sudo nixos-rebuild switch --impure --upgrade --flake ~/nixos/#nixos_desktop";
+      upgrade = "sudo nix flake update --flake ~/nixos/flake.nix && sudo nixos-rebuild switch --impure --upgrade --flake ~/nixos/#nixos_desktop";
       "7zip" = "p7zip";
   };
+
+  # idk wtf is using this, but I need it to build for now.
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-40.10.5"
+  ];
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -126,19 +140,21 @@
     kdePackages.kwalletmanager
     kdePackages.wallpaper-engine-plugin
     eden
+    efibootmgr  # Use this to reboot into windows
   ];
 
   # Mount matt-htpc home dir for easy editing.
   fileSystems."/mnt/matt-htpc" = {
-  device = "matt-htpc@192.168.1.13:/home/matt-htpc/";
-  fsType = "sshfs";
-  options = [
-    "nodev"
-    "noatime"
-    "allow_other"
-    "IdentityFile=/home/matt/.ssh/id_rsa"
-  ];
-};
+    device = "matt-htpc@192.168.1.13:/home/matt-htpc/";
+    fsType = "sshfs";
+    options = [
+      "nodev"
+      "noatime"
+      "allow_other"
+      "IdentityFile=/home/matt/.ssh/id_rsa"
+    ];
+  };
+
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
   # programs.mtr.enable = true;
@@ -165,5 +181,4 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "24.11"; # Did you read the comment?
-
 }

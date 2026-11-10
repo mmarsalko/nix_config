@@ -42,6 +42,7 @@
   fileSystems."/run/media/matt/BIGHDD" =
   {  device = "/dev/disk/by-uuid/84DE70A1DE708CE4";
      fsType = "ntfs";
+     options = [ "nofail" ]; # Don't wait for this thing, slow boot up.
   };
   swapDevices = [ ];
 
