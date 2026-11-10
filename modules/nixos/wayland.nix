@@ -15,6 +15,7 @@
     ];
 
     fonts.packages = with pkgs; [
+        anydesk
         noto-fonts
         noto-fonts-cjk-sans
         noto-fonts-color-emoji

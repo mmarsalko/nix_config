@@ -10,7 +10,6 @@
     gparted
     usbutils
     vscode-fhs # Special version of vscode that can install extensions normally
-    anydesk
     baobab
     unzip
     kdePackages.kate
