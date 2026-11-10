@@ -17,7 +17,9 @@
   # Bootloader.
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_latest;
+  #boot.kernelPackages = pkgs.linuxPackages_latest;
+  # 6.18 is the latest LTS kernel until December 2028.
+  boot.kernelPackages = pkgs.linuxPackages_6_18;
 
   networking.hostName = "matt-htpc"; # Define your hostname.
   networking.networkmanager.enable = true;
@@ -45,7 +47,7 @@
   programs.fish.shellAliases= {
       cat = "bat --paging=never";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos/#nixos_matt-htpc";
-      upgrade = "sudo nixos-rebuild switch --upgrade --flake ~/nixos/#nixos_matt-htpc";
+      upgrade = "sudo nix flake update --flake ~/nixos/flake.nix && sudo nixos-rebuild switch --upgrade --flake ~/nixos/#nixos_matt-htpc";
     };
 
   # List packages installed in system profile. To search, run:
