@@ -31,6 +31,8 @@
     podman
     htop
     starship
+    net-tools
+    kdePackages.partitionmanager
 #     winboat
     (python313.withPackages (python-pkgs: [
         python-pkgs.distro
@@ -88,7 +90,8 @@
 
   # Install mullvad
   services.mullvad-vpn.enable = true;
-  services.mullvad-vpn.package = pkgs.mullvad-vpn;
+#   services.mullvad-vpn.package = pkgs.mullvad-vpn;
+  services.mullvad-vpn.gui.enable = true;
   networking.nameservers = [ "1.1.1.1#one.one.one.one" "1.0.0.1#one.one.one.one" ];
   services.resolved = {
     enable = true;
