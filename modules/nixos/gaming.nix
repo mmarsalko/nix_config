@@ -6,6 +6,15 @@
         enable32Bit = true;
     };
 
+    # Hardware video encoding
+    hardware.graphics.extraPackages = with pkgs; [
+        pkgs.libva-vdpau-driver
+    ];
+    environment.variables = {
+        LIBVA_DRIVER_NAME = "radeonsi";  # For VA-API
+        VDPAU_DRIVER      = "radeonsi";  # For VDPAU (optional, less reliable on Wayland)
+    };
+
     boot.extraModulePackages = with config.boot.kernelPackages; [
         gcadapter-oc-kmod
     ];
@@ -92,8 +101,17 @@
         xivlauncher
         game-devices-udev-rules
         parsec-bin
+        opentrack # webcam-based head tracking
+        cloudflared  # used for Nearsec
+        portaudio # used for Nearsec
+        pulseaudio # used for Nearsec
+        libdrm # used for hw video encoding?
+        libva-utils # used for hw video encoding?
 #         poptracker
     ];
+
+    # Ensure pulseaudio isn't actually running.
+    services.pulseaudio.enable = false;
 
     # This is needed for Slippi to run.
     programs.appimage.package = pkgs.appimage-run.override {
@@ -108,7 +126,7 @@
         xdg.desktopEntries.slippi-launcher = {
             name = "Slippi Launcher";
             comment = "Super Smash Bros. Melee netplay launcher";
-            exec = "sh -c \"mullvad-exclude appimage-run ${config.users.users.matt.home}/Games/Melee/Slippi-Launcher-2.11.10-x86_64.AppImage & sleep 2 && xterm -e pkexec wii-u-gc-adapter\"";
+            exec = "sh -c \"mullvad-exclude appimage-run ${config.users.users.matt.home}/Games/Melee/Slippi & sleep 2 && xterm -e pkexec wii-u-gc-adapter\"";
             icon = "slippi-launcher";
             terminal = false;
             type = "Application";
@@ -145,5 +163,13 @@
     services.lsfg-vk = {
         enable = true;
         ui.enable = true; # installs gui for configuring lsfg-vk
+    };
+
+    # Install sunshine. No autorun, so run `sunshine` to start the server.
+    services.sunshine = {
+        enable = true;
+        autoStart = true;
+        capSysAdmin = true; # only needed for Wayland -- omit this when using with Xorg
+        openFirewall = true;
     };
 }
