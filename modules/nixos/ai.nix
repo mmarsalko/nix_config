@@ -2,7 +2,6 @@
 {
     environment.systemPackages = [
         pkgs.mcp-nixos
-        pkgs.opencode-desktop
         pkgs.ollama-rocm
     ];
 
